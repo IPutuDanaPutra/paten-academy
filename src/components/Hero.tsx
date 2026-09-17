@@ -6,12 +6,13 @@ export function Hero() {
     <section className="hero-section relative overflow-hidden bg-paper">
       <PainterlyGradient />
       <div className="hero-content relative mx-auto px-6 pb-24">
-        <h1 className="hero-headline font-serif italic text-5xl sm:text-7xl lg:text-8xl leading-[1.05]">
-          {content.hero.headlineLines.map((line, i) => (
-            <span key={i} className="block">
-              {line}
-            </span>
-          ))}
+        <h1 className="hero-headline font-serif italic leading-[1.05]">
+          <span className="block font-bold text-5xl sm:text-7xl lg:text-8xl">
+            {content.hero.headlineLines[0]}
+          </span>
+          <span className="block font-normal text-3xl sm:text-5xl lg:text-6xl mt-2">
+            {content.hero.headlineLines[1]}
+          </span>
         </h1>
         <p className="mt-8 text-lg sm:text-xl text-muted mx-auto max-w-xl">
           {content.hero.subhead}
