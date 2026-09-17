@@ -1,0 +1,42 @@
+import {
+  Brain,
+  Compass,
+  Terminal,
+  Blocks,
+  Workflow,
+  Lightbulb,
+  Code2,
+  TrendingUp,
+  GraduationCap,
+  Target,
+  Users,
+  ClipboardList,
+  Rocket,
+  Trophy,
+  UserRound,
+  Menu,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+
+export const icons = {
+  Brain,
+  Compass,
+  Terminal,
+  Blocks,
+  Workflow,
+  Lightbulb,
+  Code2,
+  TrendingUp,
+  GraduationCap,
+  Target,
+  Users,
+  ClipboardList,
+  Rocket,
+  Trophy,
+  UserRound,
+  Menu,
+  X,
+} satisfies Record<string, LucideIcon>;
+
+export type IconName = keyof typeof icons;

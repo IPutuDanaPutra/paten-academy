@@ -1,26 +1,403 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #2851ff;
+  --accent: #d4ff3d;
+  --ink: #0a0a0f;
+  --paper: #fafafa;
+  --muted: #6b7280;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-muted: var(--muted);
+  --font-serif: var(--font-serif);
+  --font-label: var(--font-label);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+@keyframes blink-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.caret {
+  display: inline-block;
+  animation: blink-caret 1s step-end infinite;
+}
+
+/* Shadows reserved for genuinely floating elements (navbar, chat panel,
+   button press-feedback) — flat cards in normal page flow use a 1px
+   hairline border instead, per Part 11 §3. */
+.btn-tactile {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255,255,255,0.4),
+    0 1px 2px rgba(10,10,15,0.08),
+    0 4px 10px rgba(10,10,15,0.06);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-tactile:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255,255,255,0.25),
+    0 1px 1px rgba(10,10,15,0.06);
+}
+
+/* Light tactile surface reused for chat bubbles/composer/chips on the dark
+   chat panel — same gradient+shadow language as .card-tactile, without its
+   hover-lift (not appropriate for a static message or input) or its own
+   fixed radius (each use picks its own corner shape) (Part 16 §3). */
+.chat-surface-tactile {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  box-shadow:
+    0 1px 2px rgba(10, 10, 15, 0.04),
+    0 4px 14px rgba(10, 10, 15, 0.07);
+}
+
+/* Same gradient/shadow language as .btn-primary-tactile, without its fixed
+   12px radius — the visitor's chat bubble needs its own corner shape. */
+.chat-bubble-primary {
+  background: linear-gradient(180deg, #3d63ff 0%, #2851ff 55%, #1f42d6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(10, 10, 15, 0.1);
+}
+
+/* Cards: gradient fill + soft shadow (Part 13 §5, supersedes Part 11 §3 for cards) */
+.card-tactile {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(10, 10, 15, 0.04),
+    0 4px 14px rgba(10, 10, 15, 0.07);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.card-tactile:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 4px rgba(10, 10, 15, 0.06),
+    0 10px 24px rgba(10, 10, 15, 0.1);
+}
+
+/* Primary buttons: tactile gradient + soft shadow (Part 13 §6) */
+.btn-primary-tactile {
+  background: linear-gradient(180deg, #3d63ff 0%, #2851ff 55%, #1f42d6 100%);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(10, 10, 15, 0.1),
+    0 8px 20px rgba(40, 81, 255, 0.2);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-primary-tactile:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(10, 10, 15, 0.08);
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.bot-bob {
+  animation: bob 3.6s ease-in-out infinite;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.panel-in {
+  animation: panel-in 0.18s ease-out;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-greeting-bubble {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  z-index: 49;
+  max-width: 220px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 14px rgba(10, 10, 15, 0.1);
+  font-size: 13.5px;
+  color: var(--ink);
+  animation: fade-in-up 0.3s ease;
+}
+
+.chat-greeting-tail {
+  position: absolute;
+  bottom: -6px;
+  right: 22px;
+  width: 12px;
+  height: 12px;
+  background: #f4f4f5;
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-greeting-bubble { animation: none; }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret, .bot-bob { animation: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+.icon-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--primary) 12%, white);
+}
+.icon-badge svg {
+  color: var(--primary);
+  width: 24px;
+  height: 24px;
+}
+.icon-badge-accent {
+  background: color-mix(in srgb, var(--accent) 20%, white);
+}
+.icon-badge-accent svg {
+  color: var(--ink);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.marquee-logo {
+  filter: grayscale(1);
+  opacity: 0.6;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.marquee-logo:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+.tilt-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.15s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+/* Painterly abstract gradient field — hero + Who This Is For (Part 8 §2/§4) */
+.hero-gradient {
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(40, 81, 255, 0.18), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(212, 255, 61, 0.14), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(255, 200, 150, 0.08), transparent 70%);
+  filter: blur(60px);
+  animation: gradient-drift 80s ease-in-out infinite alternate;
+}
+
+@keyframes gradient-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-3%, 2%) scale(1.05); }
+}
+
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-gradient { animation: none; }
+}
+
+/* Marquee statement band: slow gradient shift, our take on a recurring signature stripe (Part 9 §2.4) */
+.statement-band-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--ink) 0%,
+    color-mix(in srgb, var(--primary) 35%, var(--ink)) 25%,
+    color-mix(in srgb, var(--accent) 25%, var(--ink)) 50%,
+    color-mix(in srgb, var(--primary) 35%, var(--ink)) 75%,
+    var(--ink) 100%
+  );
+  background-size: 300% 100%;
+  animation: band-shift 20s ease-in-out infinite;
+}
+
+@keyframes band-shift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 0%; }
+  100% { background-position: 0% 0%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement-band-gradient { animation: none; }
+}
+
+/* Dot-grid texture — technical/systematic sections only (Part 10 §2.1) */
+.dot-grid-dark {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Documentary photo-card team grid (Part 12 §2) */
+.team-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: var(--ink);
+}
+.team-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+}
+.team-card .caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 18px;
+  background: linear-gradient(to top, rgba(10, 10, 15, 0.85), transparent 60%);
+}
+
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 1px rgba(10, 10, 15, 0.04),
+    0 8px 24px rgba(10, 10, 15, 0.1);
+}
+
+.nav-link {
+  position: relative;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.nav-link:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.nav-link-active {
+  background: color-mix(in srgb, var(--primary) 12%, white);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Serif display type doesn't need sans-style negative tracking — that
+   compression was collapsing word gaps at oversized hero scale (Part 13 §2). */
+.hero-headline {
+  letter-spacing: normal;
+  word-spacing: normal;
+}
+
+/* Navbar height (~56px) + top offset (20px) + genuine breathing room
+   (100px+) — recalculate this from scratch if the navbar's own dimensions
+   ever change, don't let it drift back down (Part 14 §1.1). */
+.hero-section {
+  padding-top: 220px;
+}
+
+.hero-content {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px;
+}
+
+/* Program Structure timeline: dot + label share one grid column so they
+   can't drift apart the way a separate percentage/flex system did (Part 13 §7). */
+.timeline-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  position: relative;
+}
+.timeline-track::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.timeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.timeline-node .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-bottom: 24px;
+}
+
+@media (max-width: 767px) {
+  .timeline-track {
+    grid-template-columns: 1fr;
+  }
+  .timeline-track::before {
+    display: none;
+  }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
 }
