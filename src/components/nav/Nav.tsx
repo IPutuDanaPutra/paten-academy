@@ -44,7 +44,7 @@ export function Nav() {
   return (
     <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 font-label">
       {/* Desktop pill */}
-      <div className="navbar-glass hidden md:flex items-center gap-1 rounded-full pl-5 pr-2 py-2">
+      <div className="navbar-glass hidden md:flex items-center gap-1 rounded-full pl-5 pr-5 py-2">
         <div className="relative shrink-0 mr-2" style={{ width: 96, height: 20 }}>
           <Image
             src="/logo/paten-academy-full.png"
@@ -75,7 +75,7 @@ export function Nav() {
       </div>
 
       {/* Mobile compact pill — wordmark, Apply Now (always visible), menu toggle */}
-      <div className="navbar-glass md:hidden flex items-center gap-2 rounded-full pl-3 pr-2 py-2">
+      <div className="navbar-glass md:hidden flex items-center gap-2 rounded-full pl-3 pr-5 py-2">
         <div className="relative shrink-0" style={{ width: 72, height: 16 }}>
           <Image
             src="/logo/paten-academy-full.png"

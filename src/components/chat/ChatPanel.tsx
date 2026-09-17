@@ -73,7 +73,7 @@ export function ChatPanel() {
             ) : (
               <div
                 key={i}
-                className="mr-auto max-w-[85%] font-label text-[13px] leading-relaxed px-1 text-ink"
+                className="chat-surface-tactile mr-auto max-w-[85%] font-label text-[13px] leading-relaxed text-ink rounded-lg rounded-bl-sm px-3 py-2"
               >
                 {m.content}
                 {isStreaming && i === messages.length - 1 && (
