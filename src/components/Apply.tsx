@@ -17,9 +17,10 @@ export function Apply() {
           Limited cohort spots — selected solo founders, formed into small
           accountability groups.
         </p>
-        {/* TODO: connect to real application form URL */}
         <a
-          href="#"
+          href="https://s.id/Registration-Paten-Academy"
+          target="_blank"
+          rel="noopener noreferrer"
           className="btn-tactile font-label mt-10 inline-block bg-accent text-ink font-bold px-10 py-4 rounded-full text-lg hover:brightness-95 transition-[filter]"
         >
           Apply Now

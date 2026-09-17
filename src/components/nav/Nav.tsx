@@ -66,12 +66,14 @@ export function Nav() {
             {link.label}
           </button>
         ))}
-        <button
-          onClick={() => go("apply")}
+        <a
+          href="https://s.id/Registration-Paten-Academy"
+          target="_blank"
+          rel="noopener noreferrer"
           className="btn-primary-tactile text-white text-xs font-semibold px-5 py-2.5 ml-2"
         >
           Apply Now
-        </button>
+        </a>
       </div>
 
       {/* Mobile compact pill — wordmark, Apply Now (always visible), menu toggle */}
@@ -86,12 +88,14 @@ export function Nav() {
             priority
           />
         </div>
-        <button
-          onClick={() => go("apply")}
+        <a
+          href="https://s.id/Registration-Paten-Academy"
+          target="_blank"
+          rel="noopener noreferrer"
           className="btn-primary-tactile text-white text-[11px] font-semibold px-3 py-1.5 whitespace-nowrap"
         >
           Apply Now
-        </button>
+        </a>
         <button
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle navigation menu"

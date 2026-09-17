@@ -19,7 +19,9 @@ export function Hero() {
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <a
-            href="#apply"
+            href="https://s.id/Registration-Paten-Academy"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-primary-tactile font-label inline-block text-white font-semibold px-8 py-4 text-base"
           >
             Apply Now

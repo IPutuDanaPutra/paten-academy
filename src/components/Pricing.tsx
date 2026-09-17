@@ -25,7 +25,9 @@ export function Pricing() {
         </div>
 
         <a
-          href="#apply"
+          href="https://s.id/Registration-Paten-Academy"
+          target="_blank"
+          rel="noopener noreferrer"
           className="btn-primary-tactile font-label inline-block text-white font-semibold px-8 py-3.5 text-sm mt-8"
         >
           Apply Now
