@@ -28,22 +28,27 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
+  // React's setState updater functions don't run synchronously — under
+  // automatic batching they're invoked only once the current event handler
+  // finishes, which is *after* a same-tick call to runStream() further down.
+  // That meant runStream received the array from before the user's message
+  // was appended (an empty array on the very first message), so the model
+  // never actually saw the question — this ref is the synchronous source of
+  // truth instead, and setMessages is just used to trigger a re-render.
+  const messagesRef = useRef<ChatMessage[]>([]);
+
+  const applyMessages = useCallback((next: ChatMessage[]) => {
+    messagesRef.current = next;
+    setMessages(next);
+  }, []);
+
   const send = useCallback((text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
 
     setIsOpen(true);
-    // Capture the post-append history via the updater's return value, but
-    // don't start the async request from inside the updater itself —
-    // updater functions must stay pure/side-effect-free (React may invoke
-    // them more than once), and starting a fetch + further setState calls
-    // from inside one caused the user and assistant messages to get
-    // entangled into a single bubble in production.
-    let updated: ChatMessage[] = [];
-    setMessages((prev) => {
-      updated = [...prev, { role: "user", content: trimmed }];
-      return updated;
-    });
+    const updated: ChatMessage[] = [...messagesRef.current, { role: "user", content: trimmed }];
+    applyMessages(updated);
     runStream(updated);
 
     async function runStream(history: ChatMessage[]) {
@@ -56,7 +61,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       const isCurrent = () => abortRef.current === controller;
 
       setIsStreaming(true);
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      applyMessages([...messagesRef.current, { role: "assistant", content: "" }]);
 
       try {
         const res = await fetch("/api/chat", {
@@ -79,30 +84,26 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           if (done) break;
           if (!isCurrent()) return;
           const chunk = decoder.decode(value, { stream: true });
-          setMessages((prev) => {
-            const copy = [...prev];
-            const last = copy[copy.length - 1];
-            copy[copy.length - 1] = { ...last, content: last.content + chunk };
-            return copy;
-          });
+          const copy = [...messagesRef.current];
+          const last = copy[copy.length - 1];
+          copy[copy.length - 1] = { ...last, content: last.content + chunk };
+          applyMessages(copy);
         }
       } catch (err) {
         if (controller.signal.aborted) return; // superseded by a newer message, not a real error
         console.error("useChat error:", err);
         if (!isCurrent()) return;
-        setMessages((prev) => {
-          const copy = [...prev];
-          copy[copy.length - 1] = {
-            role: "assistant",
-            content: "Something went wrong — please try again in a moment.",
-          };
-          return copy;
-        });
+        const copy = [...messagesRef.current];
+        copy[copy.length - 1] = {
+          role: "assistant",
+          content: "Something went wrong — please try again in a moment.",
+        };
+        applyMessages(copy);
       } finally {
         if (isCurrent()) setIsStreaming(false);
       }
     }
-  }, []);
+  }, [applyMessages]);
 
   const value: ChatContextValue = {
     isOpen,
