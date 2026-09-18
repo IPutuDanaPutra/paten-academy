@@ -33,11 +33,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (!trimmed) return;
 
     setIsOpen(true);
+    // Capture the post-append history via the updater's return value, but
+    // don't start the async request from inside the updater itself —
+    // updater functions must stay pure/side-effect-free (React may invoke
+    // them more than once), and starting a fetch + further setState calls
+    // from inside one caused the user and assistant messages to get
+    // entangled into a single bubble in production.
+    let updated: ChatMessage[] = [];
     setMessages((prev) => {
-      const updated: ChatMessage[] = [...prev, { role: "user", content: trimmed }];
-      runStream(updated);
+      updated = [...prev, { role: "user", content: trimmed }];
       return updated;
     });
+    runStream(updated);
 
     async function runStream(history: ChatMessage[]) {
       // Cancel any still-in-flight previous request. Its own catch block
